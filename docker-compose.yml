@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # --------------- Bus
+  bus:
+    image: jrgiadach/soabus:v1
+    container_name: soabus
+    restart: always
+    ports:
+      - "5500:5000"
+
+  # --------------- postgres
+  postgres:
+    image: postgres:14.10
+    container_name: postgres
+    restart: always
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRESQL_USER=postgres
+      - POSTGRESQL_DATABASE=arquisw
+      - ALLOW_EMPTY_PASSWORD=yes
+      - POSTGRESQL_PASSWORD=postgres
+      - POSTGRES_PASSWORD=postgres
+
