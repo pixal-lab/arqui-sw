@@ -10,7 +10,7 @@ def registro():
     contacto = input("Ingrese contacto: ")
     rol = "Paciente"
     
-    message = generate_string(service_name, 'REG,{},{},{},{},{}'.format(usuario, contrasena, nombre, rol, contacto))
+    message = generate_string(service_name, 'REG,{},{},{},{},{}'.format(rol, usuario, contrasena, nombre, contacto))
     sock.sendall(message)
     while True:
         amount_received = 0
@@ -34,7 +34,7 @@ def iniciar_sesion():
     username = input("Ingrese usuario: ")
     password = input("Ingrese password: ")
 
-    message = generate_string(service_name, 'LOG,{},{}'.format(username, password))
+    message = generate_string(service_name, 'LOG,{},{},Paciente'.format(username, password))
     sock.sendall(message)
     while True:
         amount_received = 0
@@ -59,10 +59,22 @@ def main():
     while True:
         if logged_in:
             print("Hola paciente {}, seleccione una opción:".format(nombre))
+            print("0. Salir")
+            
+            option = input("Ingrese opción: ")
+
+            match option:
+                case '0':
+                    print("Saliendo del programa.")
+                    sock.close()
+                    break
+                case _:
+                    print("Opción no válida.")
         else:
             print("Seleccione una opción:")
             print("1. Registrarse")
             print("2. Iniciar sesion")
+            print("0. Salir")
         
             option = input("Ingrese opción: ")
 

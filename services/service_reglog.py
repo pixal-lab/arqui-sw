@@ -33,7 +33,7 @@ try:
                         reg, rol, usuario, contrasena, nombre, contacto = command.split(',')
                         query = "INSERT into usuarios (nombre_usuario, contrasena, nombre_completo, rol, contacto) values ('{}', '{}', '{}', '{}', '{}')".format(usuario, contrasena, nombre, rol, contacto)
                         answer = servbd_query(query)
-                        if answer == "" or answer == "ERROR":
+                        if answer == "" or answer[:5] == "ERROR":
                             message = generate_string(service_name, "ERROR")
                             print('sending {!r}'.format (message))
                             sock.sendall (message)
@@ -41,11 +41,12 @@ try:
                             message = generate_string(service_name, nombre)
                             print('sending {!r}'.format (message))
                             sock.sendall (message)
+
                     if command.split(",")[0] == "LOG":
-                        log, Log_usuario, Log_contrasena = command.split(',')
-                        query = "select nombre_completo from usuarios where nombre_usuario = '{}' and contrasena = '{}'".format(Log_usuario, Log_contrasena)
+                        log, Log_usuario, Log_contrasena, rol = command.split(',')
+                        query = "select nombre_completo from usuarios where nombre_usuario = '{}' and contrasena = '{}' and rol = '{}'".format(Log_usuario, Log_contrasena, rol)
                         answer = servbd_query(query)
-                        if answer == "" or answer == "ERROR":
+                        if answer == "" or answer[:5] == "ERROR":
                             message = generate_string(service_name, "ERROR")
                             print('sending {!r}'.format (message))
                             sock.sendall (message)
