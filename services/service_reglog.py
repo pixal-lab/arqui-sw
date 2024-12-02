@@ -38,12 +38,12 @@ try:
                             print('sending {!r}'.format (message))
                             sock.sendall (message)
                         else:
-                            message = generate_string(service_name, answer)
+                            message = generate_string(service_name, nombre)
                             print('sending {!r}'.format (message))
                             sock.sendall (message)
                     if command.split(",")[0] == "LOG":
                         log, Log_usuario, Log_contrasena = command.split(',')
-                        query = "select rol from usuarios where nombre_usuario = '{}' and contrasena = '{}'".format(Log_usuario, Log_contrasena)
+                        query = "select nombre_completo from usuarios where nombre_usuario = '{}' and contrasena = '{}'".format(Log_usuario, Log_contrasena)
                         answer = servbd_query(query)
                         if answer == "" or answer == "ERROR":
                             message = generate_string(service_name, "ERROR")
