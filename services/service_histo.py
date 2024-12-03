@@ -1,6 +1,6 @@
 from include.bus_functions import *
 
-service_name = "REGLO"
+service_name = "HISTO"
 
 try:
 
@@ -29,22 +29,9 @@ try:
                     print("Command:", command)
 
                     # Send the command to the database service
-                    if command.split(",")[0] == "REG":
-                        reg, rol, usuario, contrasena, nombre, contacto = command.split(',')
-                        query = "INSERT into usuarios (nombre_usuario, contrasena, nombre_completo, rol, contacto) values ('{}', '{}', '{}', '{}', '{}')".format(usuario, contrasena, nombre, rol, contacto)
-                        answer = servbd_query(query)
-                        if answer == "" or answer[:5] == "ERROR":
-                            message = generate_string(service_name, "ERROR")
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-                        else:
-                            message = generate_string(service_name, nombre)
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-
-                    if command.split(",")[0] == "LOG":
-                        log, Log_usuario, Log_contrasena, rol = command.split(',')
-                        query = "select nombre_completo from usuarios where nombre_usuario = '{}' and contrasena = '{}' and rol = '{}'".format(Log_usuario, Log_contrasena, rol)
+                    if command.split(",")[0] == "INS":
+                        INS, id_paciente, id_doctor, descripcion = command.split(',')
+                        query = "INSERT into historial_medico (id_paciente, id_doctor, descripcion) values ('{}', '{}', '{}')".format(id_paciente, id_doctor, descripcion)
                         answer = servbd_query(query)
                         if answer == "" or answer[:5] == "ERROR":
                             message = generate_string(service_name, "ERROR")
@@ -55,23 +42,11 @@ try:
                             print('sending {!r}'.format (message))
                             sock.sendall (message)
 
-                    if command.split(",")[0] == "GETID":
-                        GETID, Log_usuario, rol = command.split(',')
-                        query = "select id_usuario from usuarios where nombre_usuario = '{}' and rol = '{}'".format(Log_usuario, rol)
+                    if command.split(",")[0] == "GET":
+                        GET, id_paciente = command.split(',')
+                        query = "select descripcion, fecha from historial_medico where id_paciente = '{}' ".format(id_paciente)
                         answer = servbd_query(query)
                         if answer == "" or answer[:5] == "ERROR":
-                            message = generate_string(service_name, "ERROR")
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-                        else:
-                            message = generate_string(service_name, answer)
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-
-                    if command == "GET_LIST_P":
-                        query = "select id_usuario, nombre_completo, contacto from usuarios where rol = 'Paciente'"
-                        answer = servbd_query(query)
-                        if answer == "" or answer == "ERROR":
                             message = generate_string(service_name, "ERROR")
                             print('sending {!r}'.format (message))
                             sock.sendall (message)

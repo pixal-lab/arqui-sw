@@ -52,18 +52,65 @@ def iniciar_sesion():
                 return username, answer
         break
 
+def get_id(usuario):
+    service_name = "REGLO"
+    print(service_name)
+
+    message = generate_string(service_name, 'GETID,{},Paciente'.format(usuario))
+    sock.sendall(message)
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            if answer == "ERROR" or status == "NK":
+                print("Error al obtener ID.")
+                return None, None
+            else:
+                return answer
+        break
+
+def ver_historial(id_paciente):
+    service_name = "HISTO"
+    print(service_name)
+    
+    message = generate_string(service_name, 'GET,{}'.format(id_paciente))
+    sock.sendall(message)
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None
+            else:
+                print(answer)
+                return answer
+        break
+
 def main():
     logged_in = False
     nombre = None
+    id_paciente = None
 
     while True:
         if logged_in:
             print("Hola paciente {}, seleccione una opción:".format(nombre))
+            print("1. Ver historial medico")
             print("0. Salir")
             
             option = input("Ingrese opción: ")
 
             match option:
+                case '1':
+                    ver_historial(id_paciente)
                 case '0':
                     print("Saliendo del programa.")
                     sock.close()
@@ -83,10 +130,12 @@ def main():
                     usuario, nombre = registro()
                     if nombre is not None:
                         logged_in = True
+                        id_paciente = get_id(usuario)
                 case '2':
                     usuario, nombre = iniciar_sesion()
                     if nombre is not None:
                         logged_in = True
+                        id_paciente = get_id(usuario)
                 case '0':
                     print("Saliendo del programa.")
                     sock.close()
