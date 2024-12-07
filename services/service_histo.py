@@ -31,7 +31,7 @@ try:
                     # Send the command to the database service
                     if command.split(",")[0] == "INS":
                         INS, id_paciente, id_doctor, descripcion = command.split(',')
-                        query = "INSERT into historial_medico (id_paciente, id_doctor, descripcion) values ('{}', '{}', '{}')".format(id_paciente, id_doctor, descripcion)
+                        query = "INSERT into historial_medico (id_paciente, id_doctor, descripcion, fecha) values ('{}', '{}', '{}',  CURRENT_TIMESTAMP AT TIME ZONE 'UTC+3')".format(id_paciente, id_doctor, descripcion)
                         answer = servbd_query(query)
                         if answer == "" or answer[:5] == "ERROR":
                             message = generate_string(service_name, "ERROR")

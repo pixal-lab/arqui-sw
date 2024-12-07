@@ -28,7 +28,7 @@ services:
   # --------------- servicio base de datos
   service_bdd:
     container_name: service_bdd
-    restart: always
+    restart: "no"
     build:
       context: ./services
       dockerfile: Dockerfile
@@ -70,3 +70,20 @@ services:
       - bus
     environment:
           - SOABUS_HOST=soabus
+
+
+# --------------- servicio citas
+  service_citas: 
+    container_name: service_citas
+    restart: always
+    build:
+      context: ./services
+      dockerfile: Dockerfile
+    command: sh -c "sleep 6 && python -u service_citas.py"
+    volumes:
+      - ./services:/app/
+    depends_on:
+      - bus
+    environment:
+          - SOABUS_HOST=soabus
+
