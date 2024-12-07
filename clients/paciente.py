@@ -1,4 +1,5 @@
 from include.bus_functions import *
+from datetime import datetime
 
 def registro():
     service_name = "REGLO"
@@ -95,6 +96,148 @@ def ver_historial(id_paciente):
                 return answer
         break
 
+def ver_doctores(id_paciente):
+
+    #print("A continuación se visualizarán los doctores presentes: ")
+    service_name = "CITAS"
+    print(service_name)
+    
+    message = generate_string(service_name, 'GET,{}'.format(id_paciente))
+    sock.sendall(message)
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None
+            else:
+                print(answer)
+                return answer
+        break
+
+def ver_citas(id_paciente):
+
+    #print("A continuación se visualizarán los doctores presentes: ")
+    service_name = "CITAS"
+    print(service_name)
+    
+    message = generate_string(service_name, 'VER,{}'.format(id_paciente))
+    sock.sendall(message)
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None
+            else:
+                print(answer)
+                return answer
+        break
+
+
+
+def agendar(id_paciente, nombre, nombre_doctor):
+    service_name = "CITAS"
+    print(service_name)
+  
+    usuario_paciente = id_paciente
+    nombre_paciente=nombre
+    name_doctor=nombre_doctor
+    message = generate_string(service_name, 'AGENDAR,{},{},{}'.format(usuario_paciente, nombre_paciente, name_doctor))
+    sock.sendall(message)
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None, None
+            else:
+                print("cita agendada exitosamente")
+                return answer
+        break
+
+
+def lista_citas(id_paciente):
+    service_name = "CITAS"
+    print(service_name)
+    
+    # Send the query request to the server
+    message = generate_string(service_name, 'REAGENDAR,{}'.format(id_paciente))
+    sock.sendall(message)
+    
+    results_array = []  # Array to store results
+
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))  # First 5 bytes give expected message size
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None
+            else:
+                # Assuming `answer` contains newline-separated results
+                results_array = answer.split("\n")  # Convert answer into a list of results
+                return results_array
+        break
+
+def cambiar_hora(id_cita, dia, hora):
+    service_name = "CITAS"
+    print(service_name)
+    
+    #Send the query request to the server
+    message = generate_string(service_name, 'CAMBIAR,{},{},{}'.format(id_cita,dia,hora))
+    sock.sendall(message)
+    
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))  # First 5 bytes give expected message size
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None
+            else:
+                print("Modificación exitosa!")
+        break
+
+def fecha_valida(string_fecha, formato_fecha='%d-%m-%Y'):
+    try:
+        datetime.strptime(string_fecha, formato_fecha)
+        return True
+    except:
+        return False
+
+def hora_valida(string_tiempo, formato_tiempo='%H:%M:%S'):
+    try:
+        datetime.strptime(string_tiempo, formato_tiempo)
+        return True
+    except:
+        return False
+
 def main():
     logged_in = False
     nombre = None
@@ -104,6 +247,10 @@ def main():
         if logged_in:
             print("Hola paciente {}, seleccione una opción:".format(nombre))
             print("1. Ver historial medico")
+            print("2. Ver lista de doctores")
+            print("3. Ver citas que ha realizado")
+            print("4. agendar con un doctor")
+            print("5. Re-agendar city médica")
             print("0. Salir")
             
             option = input("Ingrese opción: ")
@@ -115,6 +262,78 @@ def main():
                     print("Saliendo del programa.")
                     sock.close()
                     break
+                case '2':
+                    ver_doctores(id_paciente)
+
+                case '3':
+                    ver_citas(id_paciente)
+
+                case '4':
+                    print("Por favor, introduzca el doctor con el cual quiere realizar la cita: ")
+                    nombre_doctor = str(input("Ingrese nombre completo doctor: "))
+                    agendar(id_paciente, nombre, nombre_doctor)
+
+                case '5':
+                            citas = lista_citas(id_paciente)  # Call the function once and store the result
+
+                            if citas:  # Check if the function returned any results
+                                numero=0
+                                for cita in citas:  # Iterate over each item in the list
+                                    print(f"Cita {numero + 1}: {cita}")
+                                    numero=numero + 1
+                                
+                            else:
+                                print("No se encontraron citas.")
+
+                            eleccion=input("¿Qué cita desea modificar ")
+                            correcta=int(eleccion)
+                            final_correcta=correcta-1
+                            try:
+                                prueba = citas[int(final_correcta)]
+                            except:
+                                print("Elección errónea!")
+                            else:
+                                citas_split=citas[int(final_correcta)].strip().split()
+                                id_cita=citas_split[0].rstrip(',')
+                                #print(id_cita)
+                                print("1. La hora")
+                                print("2. Dia y hora")
+                                print("3. Cancelar cita")
+                                print("4. Volver atrás")
+                                opcion= input("Que desea cambiar? ")
+                                match opcion:
+                                    case '1' :
+                                        hora = input("Ingrese nueva hora(Formato 20:30:00, eso sería a las 20:30. utilizar formato 24hrs.) ")
+                                        if hora_valida(hora, '%H:%M:%S') == True:
+                                            dia="nada"
+                                            cambiar_hora(id_cita, dia, hora)
+                                            print("\n")
+                                            print("hora modificada exitosamente.")
+                                        else:
+                                            print("hora invalida!")
+
+                                    
+                                    case '2':
+                                        hora = input("Ingrese nueva hora(ejemplo 20:30:00, eso sería a las 20:30. utilizar formato 24hrs.) ")
+                                        if hora_valida(hora, '%H:%M:%S') == True:
+                                            dia=input("Ingrese nueva fecha(formato 20-12-2024, eso sería 20 de diciembre 2024) ")
+                                            if fecha_valida(dia, '%d-%m-%Y') == True:
+                                                cambiar_hora(id_cita, dia, hora)
+                                                print("\n")
+                                            else:
+                                                print("fecha invalida!")
+                                        else:
+                                            print("hora invalida!")
+                                    case '3':
+                                        hora="nada"
+                                        dia="nada"
+                                        cambiar_hora(id_cita,dia,hora)
+                                        print("\n")
+                                        print("Cita borrada!")
+                                    case '4':
+                                        print("\n")
+
+                                
                 case _:
                     print("Opción no válida.")
         else:
