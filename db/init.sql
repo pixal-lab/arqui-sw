@@ -40,6 +40,17 @@ CREATE TABLE inventario_farmaceutico (
     informacion VARCHAR(255) NOT NULL
 );
 
+CREATE TABLE prescripcion(
+    id_prescripcion SERIAL PRIMARY KEY,
+    id_medicamento INTEGER NOT NULL,
+    id_paciente INTEGER NOT NULL,
+    nombre_doctor VARCHAR(255) NOT NULL,
+    nombre_paciente VARCHAR(255) NOT NULL,
+    id_doctor INTEGER NOT NULL,
+    instrucciones VARCHAR(255) NOT NULL,
+    nombre_medicamento VARCHAR(255) NOT  NULL
+);
+
 
 INSERT INTO inventario_farmaceutico (nombre, cantidad_disponible, precio, informacion)
 VALUES

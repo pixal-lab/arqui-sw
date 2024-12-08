@@ -287,6 +287,127 @@ def inventario_info(id_doctor):
                 results_array = answer.split("\n")  # Convert answer into a list of results
                 return results_array
         break
+
+
+def prescribir(id_doctor, id_paciente, nombre_doctor, nombre_paciente,id_medicamento, instrucciones, nombre_medicamento):
+    service_name = "CITAS"
+    print(service_name)
+    
+    #Send the query request to the server
+    message = generate_string(service_name, 'PRESC,{},{},{},{},{},{},{}'.format(id_doctor, id_paciente, nombre_doctor, nombre_paciente, id_medicamento,instrucciones, nombre_medicamento))
+    sock.sendall(message)
+    
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))  # First 5 bytes give expected message size
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None
+            else:
+                print("Modificación exitosa!")
+        break
+
+
+def atender_cita(id_doctor, nombre_doctor):
+    citas = lista_citas(id_doctor)  # Call the function once and store the result
+
+    if citas:  # Check if the function returned any results
+        numero=0
+        for cita in citas:  # Iterate over each item in the list
+            cita=", ".join(cita.rsplit(",", 1)[:-1]).strip()
+            print(f"Cita {numero + 1}: {cita}")
+            numero=numero + 1
+    else: 
+        print("No se encontraron citas.")
+    eleccion=input("¿Qué cita desea modificar ")
+    correcta=int(eleccion)
+    final_correcta=correcta-1
+    try:
+        prueba = citas[int(final_correcta)]
+    except:
+        print("Elección errónea!")
+    else:
+        datos=citas[int(final_correcta)]
+        id_del_paciente=datos.split(',')[3].strip()
+        nombre_del_paciente=datos.split(',')[1].strip()
+        #print(nombre)
+        citas_split=citas[int(final_correcta)].strip().split()
+        id_cita=citas_split[0].rstrip(',')
+        hora="nada"
+        dia="nada"
+        cambiar_hora(id_cita,dia,hora)
+        print("\n")
+        print("Cita atendida!")
+        print("Porfavor, genere un reporte de la atención. Incluir fecha, razón de atención, y una prescripcion si es necesario")
+        insertar_historial(id_doctor)    
+        print("1. Prescribir")
+        print("2. no prescribir")
+        medicamento=input("Ingrese opcion: ")
+        match medicamento:
+            case '1':
+
+                inventario=inventario_info(id_doctor)
+                for x in inventario:
+                    print(x)
+                    print("\n")
+                id_medicamentos=input("Que medicamento quiere prescribir(1 corresponde a paracetamol, 2 a ibuprofeno y asi): ")
+                data_m=inventario[int(id_medicamentos) -1]
+                id_medicamento=data_m.split(',')[3].strip()
+                print(id_medicamento)
+                nombre_medicamento=data_m.split(',')[0].strip()
+                print(nombre_medicamento)
+                print("\n")
+                instrucciones=input("Porfavor introduzca instrucciones de la prescripcion: ")
+                prescribir(id_doctor, id_del_paciente, nombre_doctor, nombre_del_paciente,id_medicamento,instrucciones, nombre_medicamento)
+                return
+            case '2':
+                return
+        #id_medicamento=input("Que medicamento quiere prescribir(Corresponden al ultimo elemento de la string): ")
+        #print(id_doctor)
+        #print("\n")
+        #print(id_del_paciente)
+        #print("\n")
+        #print(nombre_doctor)
+        #print("\n")
+        #print(nombre_del_paciente)
+        #print("\n")
+        #print("1")
+
+def ver_prescripcion(id_doctor):
+    service_name = "CITAS"
+    print(service_name)
+    id_paciente = input('Ingrese ID del Paciente\n' + str(get_lista_paciente())+'\n')
+    # Send the query request to the server
+    message = generate_string(service_name, 'PRESVD,{},{}'.format(id_doctor, id_paciente))
+    sock.sendall(message)
+    
+    results_array = []  # Array to store results
+
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))  # First 5 bytes give expected message size
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None
+            else:
+                print("\n")
+                results_array = answer.split("\n")
+                return results_array
+        break
+
+
 def main():
     logged_in = False
     nombre = None
@@ -300,6 +421,9 @@ def main():
             print("3. Ver lista de citas")
             print("4. re-agendar citas")
             print("5. Informacion sobre medicamentos(nombre, cantidad, precio)")
+            print("6. Atender cita")
+            print("7. Ver prescripciones")
+            print("8. Modificar prescripciones")
             print("0. Salir")
             
             option = input("Ingrese opción: \n")
@@ -334,6 +458,14 @@ def main():
                     for x in info:
                         print(x)
                     print("\n")
+                case '6':
+                    atender_cita(id_doctor, nombre)
+                case '7':
+                    prescripciones=ver_prescripcion(id_doctor)
+                    if prescripciones:
+                        numero=0
+                        for prescripcion in prescripciones:
+                            print(prescripcion)
                 case _:
                     print("Opción no válida.")
                     print("\n")

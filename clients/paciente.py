@@ -276,6 +276,7 @@ def reagendar_cita(id_paciente):
         
     else:
         print("No se encontraron citas.")
+        return
 
     eleccion=input("¿Qué cita desea modificar ")
     correcta=int(eleccion)
@@ -325,6 +326,34 @@ def reagendar_cita(id_paciente):
             case '4':
                 print("\n")
 
+
+def ver_prescripcion(id_paciente):
+    service_name = "CITAS"
+    print(service_name)
+    # Send the query request to the server
+    message = generate_string(service_name, 'PRESVP,{}'.format(id_paciente))
+    sock.sendall(message)
+    
+    results_array = []  # Array to store results
+
+    while True:
+        amount_received = 0
+        amount_expected = int(sock.recv(5))  # First 5 bytes give expected message size
+
+        while amount_received < amount_expected:
+            data = sock.recv(amount_expected - amount_received)
+            amount_received += len(data)
+            service_name, status, answer = extract_string_bus(data)
+            
+            if answer == "ERROR" or status == "NK":
+                print("Error al ingresar.")
+                return None
+            else:
+                print("\n")
+                results_array = answer.split("\n")
+                return results_array
+        break
+
 def main():
     logged_in = False
     nombre = None
@@ -335,10 +364,11 @@ def main():
             print("Hola paciente {}, seleccione una opción:".format(nombre))
             print("1. Ver historial medico")
             print("2. Ver lista de doctores")
-            print("3. Ver citas que ha realizado")
+            print("3. Ver citas medicas realizado")
             print("4. agendar con un doctor")
             print("5. Re-agendar cita médica")
             print("6. Información sobre medicamentos, cantidades, precio, nombre.")
+            print("7. mis prescripcciones")
             print("0. Salir")
             option = input("Ingrese opción: \n")
             print("\n")
@@ -369,6 +399,12 @@ def main():
                     for x in info:
                         print(x)
                     print("\n")
+                case '7':
+                    prescripciones=ver_prescripcion(id_paciente)
+                    if prescripciones:
+                        numero=0
+                        for prescripcion in prescripciones:
+                            print(prescripcion)                  
                 case _:
                     print("Opción no válida.")
                     print("\n")
