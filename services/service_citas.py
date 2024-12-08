@@ -98,7 +98,6 @@ try:
                             print('sending {!r}'.format (message))
                             sock.sendall (message)
 
-                    
                     if command.split(",")[0] == "CAMBIAR":
                         print(f"Received command: {command}")
                         CAMBIAR, id_cita, dia, hora = command.split(',')
@@ -118,7 +117,6 @@ try:
                             fecha_nueva = "{} {}".format(parte_fecha, parte_tiempo)
                             query = "UPDATE citas SET fecha = '{}' WHERE id_cita = '{}'".format(fecha_nueva, id_cita)
 
-
                         answer = servbd_query(query)
                         if answer == "" or answer[:5] == "ERROR":
                             message = generate_string(service_name, "ERROR")
@@ -128,87 +126,6 @@ try:
                             message = generate_string(service_name, answer)
                             print('sending {!r}'.format (message))
                             sock.sendall (message)
-
-
-                    if command.split(",")[0] == "INFO":
-                        INFO, id_de_algo = command.split(',')
-                        query = "SELECT nombre, cantidad_disponible, precio, informacion FROM inventario_farmaceutico"
-                        print(f"Executing query: {query}")
-                        answer = servbd_query(query)
-                        print(f"Query result: {answer}")  # Debug query output
-                        if answer == "" or answer[:5] == "ERROR":
-                            message = generate_string(service_name, "ERROR")
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-                        else:
-                            message = generate_string(service_name, answer)
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-
-                    if command.split(",")[0] == "INFOD":
-                        INFOD, id_de_algo = command.split(',')
-                        query = "SELECT nombre, cantidad_disponible, precio, id_medicamento FROM inventario_farmaceutico"
-                        print(f"Executing query: {query}")
-                        answer = servbd_query(query)
-                        print(f"Query result: {answer}")  # Debug query output
-                        if answer == "" or answer[:5] == "ERROR":
-                            message = generate_string(service_name, "ERROR")
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-                        else:
-                            message = generate_string(service_name, answer)
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-
-
-                    if command.split(",")[0] == "PRESC":
-                        PRESC,id_d, id_p, nombre_d, nombre_p, id_medicamento, instrucciones, nombre_medicamento = command.split(',')
-                        query = "INSERT into prescripcion(id_medicamento, id_paciente, nombre_doctor, nombre_paciente, id_doctor, instrucciones, nombre_medicamento) values ('{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(id_medicamento,id_p,nombre_d,nombre_p,id_d, instrucciones, nombre_medicamento)
-                        print(f"Executing query: {query}")
-                        answer = servbd_query(query)
-                        print(f"Query result: {answer}")  # Debug query output
-                        if answer == "" or answer[:5] == "ERROR":
-                            message = generate_string(service_name, "ERROR")
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-                        else:
-                            message = generate_string(service_name, answer)
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-
-                    if command.split(",")[0] == "PRESVD":
-                        PRESVD, id_d, id_p = command.split(',')
-                        query="SELECT nombre_paciente, nombre_medicamento, instrucciones, id_prescripcion from prescripcion where id_doctor = '{}' and id_paciente = '{}'".format(id_d, id_p)
-                        print(f"Executing query: {query}")
-                        answer = servbd_query(query)
-                        print(f"Query result: {answer}")  # Debug query output
-                        if answer == "" or answer[:5] == "ERROR":
-                            message = generate_string(service_name, "ERROR")
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-                        else:
-                            message = generate_string(service_name, answer)
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)              
-
-                          
-                    if command.split(",")[0] == "PRESVP":
-                        PRESVD, id_p = command.split(',')
-                        query="SELECT nombre_doctor, nombre_medicamento, instrucciones, id_prescripcion from prescripcion where id_paciente = '{}'".format(id_p)
-                        print(f"Executing query: {query}")
-                        answer = servbd_query(query)
-                        print(f"Query result: {answer}")  # Debug query output
-                        if answer == "" or answer[:5] == "ERROR":
-                            message = generate_string(service_name, "ERROR")
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-                        else:
-                            message = generate_string(service_name, answer)
-                            print('sending {!r}'.format (message))
-                            sock.sendall (message)
-
-
-
 
 finally:
     print('closing socket')

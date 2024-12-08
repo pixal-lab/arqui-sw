@@ -237,7 +237,7 @@ def hora_valida(string_tiempo, formato_tiempo='%H:%M:%S'):
         return False
     
 def inventario_info(id_paciente):
-    service_name = "CITAS"
+    service_name = "INVEN"
     print(service_name)
     
     # Send the query request to the server
@@ -328,7 +328,7 @@ def reagendar_cita(id_paciente):
 
 
 def ver_prescripcion(id_paciente):
-    service_name = "CITAS"
+    service_name = "PRESC"
     print(service_name)
     # Send the query request to the server
     message = generate_string(service_name, 'PRESVP,{}'.format(id_paciente))

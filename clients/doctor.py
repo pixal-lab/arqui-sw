@@ -260,7 +260,7 @@ def reagendar_cita(id_doctor):
 
 
 def inventario_info(id_doctor):
-    service_name = "CITAS"
+    service_name = "INVEN"
     print(service_name)
     
     # Send the query request to the server
@@ -290,7 +290,7 @@ def inventario_info(id_doctor):
 
 
 def prescribir(id_doctor, id_paciente, nombre_doctor, nombre_paciente,id_medicamento, instrucciones, nombre_medicamento):
-    service_name = "CITAS"
+    service_name = "PRESC"
     print(service_name)
     
     #Send the query request to the server
@@ -380,7 +380,7 @@ def atender_cita(id_doctor, nombre_doctor):
         #print("1")
 
 def ver_prescripcion(id_doctor):
-    service_name = "CITAS"
+    service_name = "PRESC"
     print(service_name)
     id_paciente = input('Ingrese ID del Paciente\n' + str(get_lista_paciente())+'\n')
     # Send the query request to the server
